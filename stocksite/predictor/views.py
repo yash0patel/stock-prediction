@@ -1,76 +1,98 @@
+import sys
+import os
+import logging
+import joblib
+import pandas as pd
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+
+from datetime import datetime
 from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
-import pandas as pd
-import joblib
-import os
-import matplotlib
-matplotlib.use('Agg')   # Prevent GUI issues
-import matplotlib.pyplot as plt
 from django.conf import settings
-from datetime import datetime
+
+from django.http import HttpResponse
 
 def home(request):
     return HttpResponse("Indian Stock Predictor: App setup complete.")
 
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+def normalize_ticker(ticker):
+    t = ticker.strip().upper()
+    if not t.endswith('.NS'):
+        t += '.NS'
+    return t
+
 class PredictView(APIView):
     def get(self, request):
-        ticker = request.GET.get("ticker", None)
-        if not ticker:
+        raw = request.GET.get('ticker')
+        if not raw:
             return render(request, 'predictor/home.html')
 
-        feature_path = f"{ticker}_features.csv"
-        if not os.path.exists(feature_path):
-            return JsonResponse({"error": f"Features file for {ticker} not found"}, status=404)
+        ticker = normalize_ticker(raw)
+        feature_file = os.path.join(settings.BASE_DIR, 'data', f"{ticker}_features.csv")
+        model_file = os.path.join(settings.BASE_DIR, 'models', f"{ticker}_best_model.pkl")
 
-        model_path = f"models/{ticker}_model.pkl"
-        if not os.path.exists(model_path):
-            return JsonResponse({"error": f"Model for {ticker} not found"}, status=404)
+        if not os.path.exists(feature_file):
+            return JsonResponse({"error": f"Features for {ticker} not found."}, status=404)
+        if not os.path.exists(model_file):
+            return JsonResponse({"error": f"Model for {ticker} not found."}, status=404)
 
-        # Load data & model
-        df = pd.read_csv(feature_path)
-        df['Date'] = pd.to_datetime(df['Date'])  # FIX for date parsing
+        # Load features
+        df = pd.read_csv(feature_file, parse_dates=['Date'])
+        latest = df.iloc[-1:]
+        X = latest.drop(columns=[c for c in ['Date','Movement','NextClose','ReturnNext'] if c in df.columns])
 
-        row = df.iloc[-1:]
-        model = joblib.load(model_path)
+        # Load model, scaler, label encoder
+        obj = joblib.load(model_file)
+        model, scaler, le = obj['model'], obj['scaler'], obj['le']
 
-        # Prediction
-        X = row.drop(['Date', 'Movement', 'Future_Close', 'Future_Return'], axis=1)
-        pred = model.predict(X)[0]
-        pred_mapping = {0: "Neutral", 1: "Up", 2: "Down"}
-        pred_label = pred_mapping.get(pred, str(pred))
-        date = row.Date.dt.strftime('%Y-%m-%d').values[0]
+        # Scale and predict
+        X_scaled = scaler.transform(X)
+        probas = model.predict_proba(X_scaled)[0]
+        idx = probas.argmax()
+        label = le.inverse_transform([idx])[0]
+        confidence = float(probas[idx])
 
-        # Handle Movement column mapping
-        movement_data = df['Movement'].tail(20)
-        if movement_data.dtype == object:
-            y_values = movement_data.map({"Down": -1, "Neutral": 0, "Up": 1})
-        else:
-            # Assume already numeric (-1,0,1)
-            y_values = movement_data
+        # Difficulty heuristic
+        difficulty = 'low'
+        if confidence < 0.6:
+            difficulty = 'medium'
+        if confidence < 0.4:
+            difficulty = 'high'
 
-        # Chart
-        plt.figure(figsize=(10, 5))
-        plt.plot(df['Date'].tail(20), y_values, label="Actual", color="blue")
-        plt.axhline(0, color='black', linestyle='--')
-        plt.yticks([-1, 0, 1], ['Down', 'Neutral', 'Up'])
-        plt.xticks(rotation=45)
+        # Last 20 movements chart
+        hist = df[['Date','Movement']].tail(20).copy()
+        hist['Value'] = hist['Movement'].map({'Down':-1,'Neutral':0,'Up':1})
+        plt.figure(figsize=(10,4))
+        plt.plot(hist['Date'], hist['Value'], marker='o')
+        plt.yticks([-1,0,1], ['Down','Neutral','Up'])
         plt.title(f"{ticker} Last 20 Movements")
-        plt.legend()
-
-        chart_filename = f"{ticker}_{datetime.now().strftime('%Y%m%d%H%M%S')}_chart.png"
-        chart_path = os.path.join(settings.MEDIA_ROOT, chart_filename)
-        plt.savefig(chart_path, bbox_inches='tight')
+        plt.xticks(rotation=45)
+        fname = f"{ticker}_{datetime.now().strftime('%Y%m%d%H%M%S')}.png"
+        path = os.path.join(settings.MEDIA_ROOT, fname)
+        plt.savefig(path, bbox_inches='tight')
         plt.close()
-        chart_url = settings.MEDIA_URL + chart_filename
+        chart_url = settings.MEDIA_URL + fname
 
-        if request.headers.get('Accept') == 'application/json' or request.GET.get('format') == 'json':
-            return Response({"ticker": ticker, "date": date, "predicted": pred_label})
+        result = {
+            "ticker": ticker,
+            "date": latest['Date'].dt.strftime('%Y-%m-%d').values[0],
+            "predicted": label,
+            "confidence": round(confidence, 3),
+            "difficulty": difficulty
+        }
+
+        if request.GET.get('format') == 'json' or request.headers.get('Accept') == 'application/json':
+            return Response(result)
 
         return render(request, 'predictor/home.html', {
-            'predicted': pred_label,
-            'ticker': ticker,
-            'date': date,
+            **result,
             'chart_url': chart_url
         })
