@@ -23,3 +23,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('predictor.urls')), 
 ]
+
+# In stocksite/stocksite/urls.py, add:
+from django.conf.urls.static import static
+
+# At the end of the file:
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
