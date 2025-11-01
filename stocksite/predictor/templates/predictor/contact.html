@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact Us | Indian Stock Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #0b0f1a 0%, #000000 100%);
+      font-family: "Poppins", sans-serif;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: #0d1117;
+      border-bottom: 2px solid #00e6b8;
+      box-shadow: 0 0 20px rgba(0, 230, 184, 0.2);
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: #00e6b8 !important;
+      font-size: 1.5rem;
+      text-shadow: 0 0 10px rgba(0, 230, 184, 0.8);
+    }
+
+    .nav-link {
+      color: #aaa !important;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #00ffc6 !important;
+      text-shadow: 0 0 6px rgba(0, 255, 198, 0.8);
+    }
+
+    .section-title {
+      text-align: center;
+      color: #00e6b8;
+      font-weight: 700;
+      margin-top: 60px;
+      text-shadow: 0 0 15px rgba(0, 255, 198, 0.8);
+    }
+
+    .contact-container {
+      background: #0d1117;
+      border-left: 5px solid #00e6b8;
+      box-shadow: 0 0 20px rgba(0, 230, 184, 0.2);
+      border-radius: 15px;
+      padding: 40px;
+      margin: 50px auto;
+      max-width: 800px;
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+
+    .contact-container:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(0, 255, 198, 0.4);
+    }
+
+    .contact-container h4 {
+      color: #00ffc6;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .contact-info {
+      margin-top: 20px;
+    }
+
+    .contact-info p {
+      font-size: 1.1rem;
+      color: #b0b0b0;
+      margin-bottom: 10px;
+    }
+
+    .contact-info a {
+      color: #00ffc6;
+      text-decoration: none;
+      transition: 0.3s;
+    }
+
+    .contact-info a:hover {
+      text-shadow: 0 0 10px rgba(0, 255, 198, 0.8);
+    }
+
+    .social-icons a {
+      font-size: 1.8rem;
+      margin: 0 10px;
+      color: #00e6b8;
+      transition: 0.3s;
+    }
+
+    .social-icons a:hover {
+      color: #00ffc6;
+      text-shadow: 0 0 15px rgba(0, 255, 198, 0.8);
+    }
+
+    .footer {
+      background-color: #0d1117;
+      color: #888;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: auto;
+      border-top: 2px solid #00e6b8;
+      box-shadow: 0 0 15px rgba(0, 255, 198, 0.3);
+    }
+
+    .glow-sticker {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.4;
+      z-index: -1;
+    }
+
+    .sticker-green { background: #00ffb3; top: 10%; left: 15%; width: 120px; height: 120px; }
+    .sticker-red { background: #ff2e2e; bottom: 15%; right: 10%; width: 100px; height: 100px; }
+    .sticker-blue { background: #00e6ff; top: 40%; right: 25%; width: 140px; height: 140px; }
+
+    @keyframes glowPulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,255,198,0.2); }
+      50% { box-shadow: 0 0 30px rgba(0,255,198,0.5); }
+    }
+
+    .contact-container {
+      animation: glowPulse 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Stickers -->
+  <div class="glow-sticker sticker-green"></div>
+  <div class="glow-sticker sticker-red"></div>
+  <div class="glow-sticker sticker-blue"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'predict' %}">⚙️ Indian Stock Predictor</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'predict' %}">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'how_it_works' %}">How it Works</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contact Section -->
+  <div class="container">
+    <h1 class="section-title">Contact Us</h1>
+
+    <div class="contact-container">
+      <h4>We’d Love to Hear From You 💬</h4>
+      <p>
+        Whether you have a question about predictions, feedback on our design, or ideas for improvement —
+        feel free to reach out! Our team is always excited to connect with users and collaborators.
+      </p>
+
+      <div class="contact-info">
+        <p>📧 <strong>Email Support:</strong></p>
+        <p><a href="mailto:yashpatelrupal@gmail.com">yashpatelrupal@gmail.com</a></p>
+        <p><a href="mailto:nishantpurohit04@gmail.com">nishantpurohit04@gmail.com</a></p>
+      </div>
+
+      <div class="social-icons mt-4">
+        <a href="mailto:yashpatelrupal@gmail.com" title="Email Yash" target="_blank"><i class="bi bi-envelope-fill"></i></a>
+        <a href="https://github.com/yash0patel" title="GitHub" target="_blank"><i class="bi bi-github"></i></a>
+        <a href="https://www.linkedin.com/in/yashpatel2k26" title="LinkedIn" target="_blank"><i class="bi bi-linkedin"></i></a>
+       </div>
+
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="mb-0">© 2025 Indian Stock Predictor</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+</body>
+</html>

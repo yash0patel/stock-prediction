@@ -49,13 +49,13 @@ class PredictView(APIView):
         os.makedirs(os.path.dirname(feature_file), exist_ok=True)
         os.makedirs(os.path.dirname(model_file), exist_ok=True)
 
-        # ⭐ KEY FIX: Auto-generate missing files instead of 404 error
+        # KEY FIX: Auto-generate missing files instead of 404 error
         stock_obj, _ = Stock.objects.get_or_create(ticker=ticker, defaults={'name': ticker})
         
         if not os.path.exists(feature_file) or not os.path.exists(model_file):
             logger.info(f"🔄 Generating data and model for {ticker}")
             try:
-                # Step 1: Generate features (download data, create technical indicators)
+                # Step 1: Generate features
                 success = process_stock(stock_obj)
                 if not success:
                     return render(request, 'predictor/home.html', {
@@ -99,8 +99,11 @@ class PredictView(APIView):
             # Make prediction
             X_scaled = scaler.transform(X)
             probas = model.predict_proba(X_scaled)
+            # Ensure a 1-D probability array
+            if probas.ndim == 2:
+                probas = probas[0]
             idx = probas.argmax()
-            label = le.inverse_transform([idx])
+            label = le.inverse_transform([idx])[0]
             confidence = float(probas[idx])
 
             # Calculate difficulty level
@@ -129,7 +132,7 @@ class PredictView(APIView):
 
             result = {
                 "ticker": ticker,
-                "date": latest['Date'].dt.strftime('%Y-%m-%d').values,
+                "date": latest['Date'].dt.strftime('%Y-%m-%d').values[0],
                 "predicted": label,
                 "confidence": round(confidence, 3),
                 "difficulty": difficulty,
@@ -146,3 +149,25 @@ class PredictView(APIView):
             return render(request, 'predictor/home.html', {
                 'error': f'❌ Prediction failed for {ticker}: {str(e)}'
             })
+
+
+def how_it_works(request):
+    context = {
+        "title": "How It Works | Indian Stock Predictor",
+        "description": (
+            "Understand how the Indian Stock Predictor fetches, processes, "
+            "and predicts next-day stock movements using ML models."
+        )
+    }
+    return render(request, 'predictor/how_it_works.html', context)
+
+def contact_us(request):
+    context = {
+        "title": "Contact Us | Indian Stock Predictor",
+        "emails": [
+            "yashpatelrupal@gmail.com",
+            "nishantpurohit04@gmail.com",
+        ],
+        "description": "Reach out for queries, suggestions, or collaborations related to the Indian Stock Predictor project."
+    }
+    return render(request, 'predictor/contact.html', context)

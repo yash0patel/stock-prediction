@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How It Works | Indian Stock Predictor</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body {
+      background: radial-gradient(circle at top left, #0b0f1a 0%, #000000 100%);
+      font-family: "Poppins", sans-serif;
+      color: #e0e0e0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    .navbar {
+      background: #0d1117;
+      border-bottom: 2px solid #00e6b8;
+      box-shadow: 0 0 20px rgba(0, 230, 184, 0.2);
+    }
+
+    .navbar-brand {
+      font-weight: bold;
+      color: #00e6b8 !important;
+      font-size: 1.5rem;
+      text-shadow: 0 0 10px rgba(0, 230, 184, 0.8);
+    }
+
+    .nav-link {
+      color: #aaa !important;
+      transition: 0.3s;
+    }
+
+    .nav-link:hover {
+      color: #00ffc6 !important;
+      text-shadow: 0 0 6px rgba(0, 255, 198, 0.8);
+    }
+
+    .section-title {
+      text-align: center;
+      color: #00e6b8;
+      font-weight: 700;
+      margin-top: 60px;
+      text-shadow: 0 0 15px rgba(0, 255, 198, 0.8);
+    }
+
+    /* Timeline container */
+    .timeline {
+      position: relative;
+      max-width: 900px;
+      margin: 50px auto;
+      padding: 0 10px;
+    }
+
+    /* Timeline line */
+    .timeline::after {
+      content: '';
+      position: absolute;
+      width: 6px;
+      background-color: #00e6b8;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      margin-left: -3px;
+      border-radius: 3px;
+      box-shadow: 0 0 20px rgba(0, 255, 198, 0.4);
+    }
+
+    /* Timeline items */
+    .timeline-item {
+      padding: 20px 40px;
+      position: relative;
+      background-color: inherit;
+      width: 50%;
+    }
+
+    .timeline-item::after {
+      content: ' ';
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      right: -13px;
+      background-color: #00e6b8;
+      border: 3px solid #0d1117;
+      top: 25px;
+      border-radius: 50%;
+      z-index: 1;
+      box-shadow: 0 0 20px rgba(0, 255, 198, 0.8);
+    }
+
+    /* Left side */
+    .left {
+      left: 0;
+    }
+
+    /* Right side */
+    .right {
+      left: 50%;
+    }
+
+    /* Arrows */
+    .left::before {
+      content: "▶";
+      position: absolute;
+      top: 28px;
+      right: -15px;
+      color: #00ffc6;
+      font-size: 1rem;
+    }
+
+    .right::before {
+      content: "◀";
+      position: absolute;
+      top: 28px;
+      left: -15px;
+      color: #00ffc6;
+      font-size: 1rem;
+    }
+
+    /* Content box */
+    .content {
+      padding: 20px 30px;
+      background: #0d1117;
+      border-left: 5px solid #00e6b8;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 230, 184, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .content:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 0 25px rgba(0, 255, 198, 0.4);
+    }
+
+    .content h3 {
+      color: #00ffc6;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .content p {
+      color: #b0b0b0;
+      line-height: 1.7;
+      font-size: 1.05rem;
+    }
+
+    .highlight {
+      color: #00ffc6;
+      font-weight: 600;
+    }
+
+    /* Summary box */
+    .summary-box {
+      background: #081018;
+      border: 1px solid #00ffc6;
+      box-shadow: 0 0 25px rgba(0, 255, 198, 0.2);
+      padding: 25px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 50px auto;
+      max-width: 700px;
+    }
+
+    .summary-box h4 {
+      color: #00e6b8;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    /* Stickers */
+    .glow-sticker {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      opacity: 0.4;
+      z-index: -1;
+    }
+
+    .sticker-green { background: #00ffb3; top: 10%; left: 15%; width: 120px; height: 120px; }
+    .sticker-red { background: #ff2e2e; bottom: 15%; right: 10%; width: 100px; height: 100px; }
+    .sticker-blue { background: #00e6ff; top: 40%; right: 25%; width: 140px; height: 140px; }
+
+    .footer {
+      background-color: #0d1117;
+      color: #888;
+      text-align: center;
+      padding: 15px 0;
+      margin-top: auto;
+      border-top: 2px solid #00e6b8;
+      box-shadow: 0 0 15px rgba(0, 255, 198, 0.3);
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 768px) {
+      .timeline::after { left: 20px; }
+      .timeline-item { width: 100%; padding-left: 60px; padding-right: 25px; }
+      .timeline-item::after { left: 9px; }
+      .left::before, .right::before { display: none; }
+      .right { left: 0; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Stickers -->
+  <div class="glow-sticker sticker-green"></div>
+  <div class="glow-sticker sticker-red"></div>
+  <div class="glow-sticker sticker-blue"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm">
+    <div class="container">
+      <a class="navbar-brand" href="{% url 'predict' %}">⚙️ Indian Stock Predictor</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="{% url 'predict' %}">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="#">How it Works</a></li>
+          <li class="nav-item"><a class="nav-link" href="{% url 'contact_us' %}">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <div class="container mt-5 mb-5">
+    <h1 class="section-title">How It Works</h1>
+
+    <div class="timeline">
+      <div class="timeline-item left">
+        <div class="content">
+          <h3>🔹 Overview</h3>
+          <p>
+            The <span class="highlight">Indian Stock Predictor</span> helps users forecast next-day movements
+            (Up, Down, or Neutral) for Indian stocks listed on NSE and BSE using machine learning models.
+          </p>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="content">
+          <h3>1️⃣ Input Stock Symbol</h3>
+          <p>Enter a ticker (e.g., <span class="highlight">RELIANCE.NS</span>) — data collection begins instantly.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="content">
+          <h3>2️⃣ Data Acquisition</h3>
+          <p>Fetches recent <span class="highlight">price and volume data</span> from <span class="highlight">yfinance API</span>.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="content">
+          <h3>3️⃣ Preprocessing</h3>
+          <p>Cleans, normalizes, and scales the dataset to improve accuracy and stability.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="content">
+          <h3>4️⃣ Feature Engineering</h3>
+          <p>Generates indicators like <span class="highlight">SMA, EMA, RSI, MACD</span> to detect trends.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="content">
+          <h3>5️⃣ Prediction</h3>
+          <p>Uses <strong>Logistic Regression</strong>, <strong>XGBoost</strong>, and <strong>LightGBM</strong>
+          to predict next-day stock trends.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item left">
+        <div class="content">
+          <h3>6️⃣ Results Display</h3>
+          <p>Shows <span class="highlight">confidence score</span> and price chart with interactive visuals.</p>
+        </div>
+      </div>
+
+      <div class="timeline-item right">
+        <div class="content">
+          <h3>7️⃣ User Interface</h3>
+          <p>Clean, responsive, and optimized for desktop with one-click prediction.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-box">
+      <h4>✨ Summary</h4>
+      <p>
+        The <strong>Indian Stock Predictor</strong> enables investors and learners to use
+        <span class="highlight">AI-powered insights</span> for stock forecasting — all built on
+        free APIs and open-source ML libraries.
+      </p>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p class="mb-0">© 2025 Indian Stock Predictor</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -4,6 +4,7 @@ import logging
 import warnings
 import pandas as pd
 import numpy as np
+import joblib
 from datetime import datetime
 from sklearn.model_selection import train_test_split, TimeSeriesSplit
 from sklearn.preprocessing import StandardScaler, LabelEncoder
@@ -169,12 +170,12 @@ def train_one(filepath):
     except Exception as e:
         logger.error(f"Error training Ensemble: {e}")
 
-    # Save best model
+    # Save best model using joblib.dump to ensure correct dict serialization
     if best_model is not None:
         model_path = os.path.join(MODELS_DIR, f"{ticker}_best_model.pkl")
         if os.path.exists(model_path):
             os.remove(model_path)
-        pd.to_pickle({'model': best_model, 'scaler': scaler, 'le': le}, model_path)
+        joblib.dump({'model': best_model, 'scaler': scaler, 'le': le}, model_path)
         logger.info(f"Saved best model {best_name} (Acc: {best_acc:.4f}) to {model_path}")
     else:
         logger.warning(f"No model was trained successfully for {ticker}")
